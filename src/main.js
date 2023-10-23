@@ -33,55 +33,20 @@ makeMyBookButton.addEventListener('click', makeBook);
 homeButton.addEventListener('click', showHomeView);
 
 // Create your event handlers and other functions here 👇
-function addCoverToSavedCovers() {
-  if (savedCovers.includes(currentCover)) {
-  } else {
-    savedCovers.push(currentCover);
+function getRandomIndex(array) {
+  return Math.floor(Math.random() * array.length);
+}
+
+function createCover(imgSrc, title, descriptor1, descriptor2) {
+  var cover = {
+    id: Date.now(),
+    coverImg: imgSrc,
+    title: title,
+    tagline1: descriptor1,
+    tagline2: descriptor2
   }
+  return cover;
 }
-
-function displaySavedCovers() {
-  savedCoversSection.innerHTML = ""; 
-  for (var i = 0; i < savedCovers.length; i++) {
-    var currentCover = savedCovers[i];
-
-    var miniCoverDiv = document.createElement('div');
-    miniCoverDiv.classList.add('mini-cover');
-    miniCoverDiv.id = i; // Add id property to identify the cover
-
-    var miniCoverImage = document.createElement('img');
-    miniCoverImage.src = currentCover.coverImg;
-    miniCoverImage.classList.add('mini-cover');
-
-    var miniCoverTitle = document.createElement('h2');
-    miniCoverTitle.innerText = currentCover.title;
-    miniCoverTitle.classList.add('cover-title');
-
-    var miniCoverTagline1 = document.createElement('h3');
-    miniCoverTagline1.innerText = currentCover.tagline1;
-    miniCoverTagline1.classList.add('tagline');
-
-    var miniCoverTagline2 = document.createElement('h3');
-    miniCoverTagline2.innerText = currentCover.tagline2;
-    miniCoverTagline2.classList.add('tagline');
-
-    miniCoverDiv.appendChild(miniCoverImage);
-    miniCoverDiv.appendChild(miniCoverTitle);
-    miniCoverDiv.appendChild(miniCoverTagline1);
-    miniCoverDiv.appendChild(miniCoverTagline2);
-
-    savedCoversSection.appendChild(miniCoverDiv);
-
-    miniCoverDiv.addEventListener('dblclick', deleteSavedCover);
-  }
-}
-
-function deleteSavedCover(event) {
-  var coverSelected = event.currentTarget.id;
-  savedCovers.splice(coverSelected, 1);
-  displaySavedCovers();
-}
-
 
 function generateRandomCover() {
   var imgSrc = covers[getRandomIndex(covers)];
@@ -96,6 +61,72 @@ function generateRandomCover() {
   currentCover = createCover(imgSrc, title, descriptor1, descriptor2);
 }
 
+function addCoverToSavedCovers() {
+  if (savedCovers.includes(currentCover)) {
+  } else {
+    savedCovers.push(currentCover);
+  }
+}
+
+function displaySavedCovers() {
+  savedCoversSection.innerHTML = ""; 
+  for (var i = 0; i < savedCovers.length; i++) {
+    var currentCover = savedCovers[i];
+
+    var miniCoverDiv = document.createElement('div');
+    miniCoverDiv.classList.add('mini-cover');
+    miniCoverDiv.id = i;
+
+    var miniCoverImage = document.createElement('img');
+    miniCoverImage.src = currentCover.coverImg;
+    miniCoverImage.classList.add('mini-cover');
+
+    var miniCoverTitle = document.createElement('h2');
+    miniCoverTitle.innerText = currentCover.title;
+    miniCoverTitle.classList.add('cover-title');
+
+    var miniCoverTagline = document.createElement('h3');
+    miniCoverTagline.classList.add('tagline');
+
+    var tagline1Span = document.createElement('span');
+    tagline1Span.classList.add('tagline-1');
+    tagline1Span.innerText = currentCover.tagline1;
+
+    var tagline2Span = document.createElement('span');
+    tagline2Span.classList.add('tagline-2');
+    tagline2Span.innerText = currentCover.tagline2;
+
+    miniCoverTagline.appendChild(document.createTextNode('A tale of '));
+    miniCoverTagline.appendChild(tagline1Span);
+    miniCoverTagline.appendChild(document.createTextNode(' and '));
+    miniCoverTagline.appendChild(tagline2Span);
+
+    var miniCoverPriceTag = document.createElement('img');
+    miniCoverPriceTag.src = './assets/price.png';
+    miniCoverPriceTag.classList.add('price-tag');
+
+    var miniCoverOverlay = document.createElement('img');
+    miniCoverOverlay.src = './assets/overlay.png';
+    miniCoverOverlay.classList.add('overlay');
+
+    miniCoverDiv.appendChild(miniCoverImage);
+    miniCoverDiv.appendChild(miniCoverTitle);
+    miniCoverDiv.appendChild(miniCoverTagline);
+    miniCoverDiv.appendChild(miniCoverPriceTag);
+    miniCoverDiv.appendChild(miniCoverOverlay);
+
+    savedCoversSection.appendChild(miniCoverDiv);
+
+    miniCoverDiv.addEventListener('dblclick', deleteSavedCover);
+  }
+}
+
+function deleteSavedCover(event) {
+  var coverSelected = event.currentTarget.id;
+  savedCovers.splice(coverSelected, 1);
+  displaySavedCovers();
+}
+
 function generateUserCover() {
   coverImage.src = userCover
   coverTitle.innerText = userTitle;
@@ -104,6 +135,25 @@ function generateUserCover() {
 
   currentCover = createCover(userCover, userTitle, userDesc1, userDesc2);
 }
+
+function makeBook (event) {
+  event.preventDefault();
+  userCover = userCover.value;
+  userTitle = userTitle.value;
+  userDesc1 = userDesc1.value;
+  userDesc2 = userDesc2.value;
+  userInput = createCover(userCover, userTitle, userDesc1, userDesc2);
+  covers.push(userInput.coverImg);
+  titles.push(userInput.title);
+  descriptors.push(userInput.tagline1);
+  descriptors.push(userInput.tagline2);
+  hide(formView);
+  show(homeView);
+  show(saveCoverButton);
+  show(randomCoverButton);
+  hide(homeButton);
+  generateUserCover();
+ }
 
 function show(element) {
   element.classList.remove('hidden');
@@ -138,38 +188,3 @@ function showFormView() {
   hide(homeButton);
   generateRandomCover();
  }
-
- function makeBook (event) {
-  event.preventDefault();
-  userCover = userCover.value;
-  userTitle = userTitle.value;
-  userDesc1 = userDesc1.value;
-  userDesc2 = userDesc2.value;
-  userInput = createCover(userCover, userTitle, userDesc1, userDesc2);
-  covers.push(userInput.coverImg);
-  titles.push(userInput.title);
-  descriptors.push(userInput.tagline1);
-  descriptors.push(userInput.tagline2);
-  hide(formView);
-  show(homeView);
-  show(saveCoverButton);
-  show(randomCoverButton);
-  hide(homeButton);
-  generateUserCover();
- }
-
-// We've provided two functions to get you started
-function getRandomIndex(array) {
-  return Math.floor(Math.random() * array.length);
-}
-
-function createCover(imgSrc, title, descriptor1, descriptor2) {
-  var cover = {
-    id: Date.now(),
-    coverImg: imgSrc,
-    title: title,
-    tagline1: descriptor1,
-    tagline2: descriptor2
-  }
-  return cover;
-}
